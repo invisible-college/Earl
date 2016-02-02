@@ -40,11 +40,15 @@ A convenience method for changing the page's url and associated state. Parameter
 Outside of the typical channels, you can communicate with Earl through this state:
 
 #### fetch('location')
+
 `url`: the current browser location
+
 `query_params`: browser search values (e.g. blah?foo=fab&bar=nice)
+
 `hash`: the anchor tag (if any) in the link. e.g. blah.html#hash
 
 #### fetch('document')
+
 `title`: the window title
 
 ## Developing with Earl
