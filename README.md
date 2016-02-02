@@ -53,7 +53,7 @@ Outside of the typical channels, you can communicate with Earl through this stat
 
 ## Developing with Earl
 
-Often when prototyping Statebus applications, we like to open flat .html files using the file:// protocol in our browser. Unfortunately, browsers don't support the HTML5 history API for the file:// protocol. The workaround for now is to run a node server. I've found that https://github.com/paulmillr/pushserve works best because it also supports reloading a page at a url based off of your html file. 
+Often when prototyping Statebus applications, we like to open .html files in our browser using the file:// protocol. Unfortunately, browsers don't support the HTML5 history API for file://. The workaround for now is to run a node server. I've found that https://github.com/paulmillr/pushserve works best because it also supports reloading a page at a url based off of your html file. 
 ```
 npm install -g pushserve
 pushserve -p 3002 -i demo.html
