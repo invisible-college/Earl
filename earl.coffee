@@ -112,7 +112,12 @@ install_history_aware_links = ->
   dom.HISTORY_IGNORANT_LINK = window.A
   history_aware_links_installed = true 
 
-  # todo: we might need to call statebus load_component...
+  # This has to occur BEFORE statebus runs make_component on everything in window.dom. That happens
+  # after the initial compilation and evaluation of the coffeescript code. So you should call
+  # Earl.start_work should be called during the initial evaluation of the coffeescript if you want
+  # history aware links. 
+  # TODO: Either find a way around this requirement, or detect a bad sitution and provide a good
+  #       error message. 
   dom.A = ->
     props = @props
     if @props.href
