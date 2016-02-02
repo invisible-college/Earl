@@ -31,7 +31,7 @@
 
 ###################################
 # Earl's API (Admissible Professional Inquiries): 
-#
+
 #   Earl.start_work
 #     opts: 
 #        history_aware_links: Enables history aware link. Wraps basic dom.A. [false]
@@ -112,14 +112,6 @@ install_history_aware_links = ->
   dom.HISTORY_IGNORANT_LINK = window.A
   history_aware_links_installed = true 
 
-  document.ontouchmove = (e) -> Earl._user_swipping = true
-  document.ontouchend  = (e) -> Earl._user_swipping = false
-  rxaosp = window.navigator.userAgent.match /Android.*AppleWebKit\/([\d.]+)/ 
-  is_android_browser = !!(rxaosp && rxaosp[1]<537)
-  ua = navigator.userAgent
-  is_mobile = is_android_browser || \
-    ua.match(/(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i)
-
   # todo: we might need to call statebus load_component...
   dom.A = ->
     props = @props
@@ -192,7 +184,7 @@ react_to_location = ->
 
       # update browser history if it hasn't already been updated
       if url_from_browser_location() != new_location
-        history.pushState loc.query_params, title, (Earl.root + '/' + new_location).replace('//', '/')
+        history.pushState loc.query_params, title, (Earl.root + '/' + new_location).replace(/(\/)+/', '/')
 
       @last_location = new_location
 
@@ -234,3 +226,15 @@ url_from_statebus = ->
     relative_url += "##{loc.hash}"
 
   relative_url
+
+
+
+
+# For handling device-specific annoyances
+document.ontouchmove = (e) -> Earl._user_swipping = true
+document.ontouchend  = (e) -> Earl._user_swipping = false
+rxaosp = window.navigator.userAgent.match /Android.*AppleWebKit\/([\d.]+)/ 
+is_android_browser = !!(rxaosp && rxaosp[1]<537)
+ua = navigator.userAgent
+is_mobile = is_android_browser || \
+  ua.match(/(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i)
