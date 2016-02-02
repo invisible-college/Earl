@@ -116,6 +116,9 @@ Earl.start_work
   window.scripts_to_load = {}
   var statebus_client = "https://rawgit.com/invisible-college/statebus/master/client.js"   
   document.write( '<script src="' + statebus_client + '" charset="utf-8"><\/script>')
-  document.write( '<script src="' + 'earl.js' + '" charset="utf-8"><\/script>')
+
+  var earldir = "https://rawgit.com/invisible-college/Earl/master/"
+  //var earldir = "../"
+  document.write( '<script src="' + earldir + 'earl.js' + '" charset="utf-8"><\/script>')
 
 </script>

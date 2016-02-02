@@ -1,48 +1,49 @@
 var history_aware_links_installed, install_history_aware_links, react_to_location, seek_to_hash, url_from_browser_location, url_from_statebus;
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty;
-window.Earl = {};
-Earl.start_work = function(opts) {
-  opts || (opts = {});
-  if (opts.history_aware_links) {
-    install_history_aware_links();
-  }
-  opts.root || (opts.root = '/');
-  if (opts.root[0] !== '/') {
-    opts.root = '/' + opts.root;
-  }
-  Earl.root = opts.root;
-  react_to_location();
-  window.addEventListener('popstate', function(ev) {
-    return Earl.load_page(url_from_browser_location());
-  });
-  return Earl.load_page(url_from_browser_location());
-};
-Earl.load_page = function(url, query_params) {
-  var hash, loc, query_param, seek_to_hash, _i, _len, _ref, _ref2, _ref3;
-  loc = fetch('location');
-  loc.query_params = query_params || {};
-  if (url.indexOf('?') > -1) {
-    _ref = url.split('?'), url = _ref[0], query_params = _ref[1];
-    _ref2 = query_params.split('&');
-    for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-      query_param = _ref2[_i];
-      query_param = query_param.split('=');
-      if (query_param.length === 2) {
-        loc.query_params[query_param[0]] = query_param[1];
+window.Earl = {
+  start_work: function(opts) {
+    opts || (opts = {});
+    if (opts.history_aware_links) {
+      install_history_aware_links();
+    }
+    opts.root || (opts.root = '/');
+    if (opts.root[0] !== '/') {
+      opts.root = '/' + opts.root;
+    }
+    Earl.root = opts.root;
+    window.addEventListener('popstate', function(ev) {
+      return Earl.load_page(url_from_browser_location());
+    });
+    Earl.load_page(url_from_browser_location());
+    return react_to_location();
+  },
+  load_page: function(url, query_params) {
+    var hash, loc, query_param, seek_to_hash, _i, _len, _ref, _ref2, _ref3;
+    loc = fetch('location');
+    loc.query_params = query_params || {};
+    if (url.indexOf('?') > -1) {
+      _ref = url.split('?'), url = _ref[0], query_params = _ref[1];
+      _ref2 = query_params.split('&');
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        query_param = _ref2[_i];
+        query_param = query_param.split('=');
+        if (query_param.length === 2) {
+          loc.query_params[query_param[0]] = query_param[1];
+        }
       }
     }
-  }
-  hash = '';
-  if (url.indexOf('#') > -1) {
-    _ref3 = url.split('#'), url = _ref3[0], hash = _ref3[1];
-    if (url === '') {
-      url = '/';
+    hash = '';
+    if (url.indexOf('#') > -1) {
+      _ref3 = url.split('#'), url = _ref3[0], hash = _ref3[1];
+      if (url === '') {
+        url = '/';
+      }
+      seek_to_hash = true;
     }
-    seek_to_hash = true;
+    loc.url = url;
+    loc.hash = hash;
+    return save(loc);
   }
-  loc.url = url;
-  loc.hash = hash;
-  return save(loc);
 };
 history_aware_links_installed = false;
 install_history_aware_links = function() {
@@ -65,7 +66,7 @@ install_history_aware_links = function() {
   is_android_browser = !!(rxaosp && rxaosp[1] < 537);
   ua = navigator.userAgent;
   is_mobile = is_android_browser || ua.match(/(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i);
-  dom.A = function() {
+  return dom.A = function() {
     var handle_click, onClick, props;
     props = this.props;
     if (this.props.href) {
@@ -109,7 +110,6 @@ install_history_aware_links = function() {
     }
     return dom.HISTORY_IGNORANT_LINK(props, props.children);
   };
-
 };
 react_to_location = function() {
   var monitor;

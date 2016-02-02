@@ -19,75 +19,81 @@
 # If you want to serve older non-pushstate compatible browsers try installing the 
 # https://github.com/devote/HTML5-History-API polyfill first. 
 #
+#
+# Aside from the public API, you can communicate with Earl through this state:
+#    fetch('location')
+#         url: the current browser location
+#         query_params: browser search values (e.g. blah?foo=fab&bar=nice)
+#         hash: the anchor tag (if any) in the link. e.g. blah.html#hash
+#    fetch('document')
+#         title: the window title
 
 
-
-
-window.Earl = {}
-
-# Earl's API (Accepted Prodding Inquiries): 
+###################################
+# Earl's API (Admissible Professional Inquiries): 
 #
 #   Earl.start_work
 #     opts: 
-#        history_aware_links: Enables history aware link. Wraps basic dom.A. 
-#        root: the base path that urls are relative too, such as my_root.html. 
-#              defaults to "/"
+#        history_aware_links: Enables history aware link. Wraps basic dom.A. [false]
+#        root: the base path that urls are relative too, such as my_root.html. ['/']
 #   Earl.load_page
 #     Convenience method for changing the page's url
 
-Earl.start_work = (opts) -> 
-  opts ||= {}
+window.Earl =
 
-  if opts.history_aware_links
-    install_history_aware_links()
+  start_work: (opts) -> 
+    opts ||= {}
 
-  opts.root ||= '/'
-  if opts.root[0] != '/'
-    opts.root = '/' + opts.root
-  Earl.root = opts.root
+    if opts.history_aware_links
+      install_history_aware_links()
 
-  # Put Earl to work!
-  react_to_location()
+    opts.root ||= '/'
+    if opts.root[0] != '/'
+      opts.root = '/' + opts.root
+    Earl.root = opts.root
 
-  # Earl must also update us if the browser back or forward button pressed
-  window.addEventListener 'popstate', (ev) -> 
+    # Earl, don't forget to update us if the browser back or forward button pressed
+    window.addEventListener 'popstate', (ev) -> 
+      Earl.load_page url_from_browser_location()
+
+    # By all means Earl, initialize location state
     Earl.load_page url_from_browser_location()
 
-  # Initialize location state
-  Earl.load_page url_from_browser_location()
+    # Earl, don't fall asleep on the job!
+    react_to_location()
 
 
-# Updating the browser window location. 
-Earl.load_page = (url, query_params) ->
-  loc = fetch('location')
-  loc.query_params = query_params or {}
+  # Updating the browser window location. 
+  load_page: (url, query_params) ->
+    loc = fetch('location')
+    loc.query_params = query_params or {}
 
-  # if the url has query pachrameters, parse and merge them into params
-  if url.indexOf('?') > -1
-    [url, query_params] = url.split('?')
+    # if the url has query pachrameters, parse and merge them into params
+    if url.indexOf('?') > -1
+      [url, query_params] = url.split('?')
 
-    for query_param in query_params.split('&')
-      query_param = query_param.split('=')
-      if query_param.length == 2
-        loc.query_params[query_param[0]] = query_param[1]
+      for query_param in query_params.split('&')
+        query_param = query_param.split('=')
+        if query_param.length == 2
+          loc.query_params[query_param[0]] = query_param[1]
 
-  # ...and parse anchors
-  hash = ''
-  if url.indexOf('#') > -1
-    [url, hash] = url.split('#')
-    url = '/' if url == ''
+    # ...and parse anchors
+    hash = ''
+    if url.indexOf('#') > -1
+      [url, hash] = url.split('#')
+      url = '/' if url == ''
 
-    # When loading a page with a hash, we need to scroll the page
-    # to proper element represented by that id. This is hard to 
-    # represent in Statebus, as it is more of an event than state.
-    # We'll set seek_to_hash here, then it will get set to null 
-    # after it is processed. 
-    seek_to_hash = true
+      # When loading a page with a hash, we need to scroll the page
+      # to proper element represented by that id. This is hard to 
+      # represent in Statebus, as it is more of an event than state.
+      # We'll set seek_to_hash here, then it will get set to null 
+      # after it is processed. 
+      seek_to_hash = true
 
-  loc.url = url
-  loc.hash = hash
+    loc.url = url
+    loc.hash = hash
 
-  save loc
+    save loc
 
 
 
