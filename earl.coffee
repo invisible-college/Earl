@@ -35,7 +35,7 @@
 #   Earl.start_work
 #     opts: 
 #        history_aware_links: Enables history aware link. Wraps basic dom.A. [false]
-#        root: the base path that urls are relative too, such as my_root.html. ['/']
+
 #   Earl.load_page
 #     Convenience method for changing the page's url
 
@@ -47,10 +47,9 @@ window.Earl =
     if opts.history_aware_links
       install_history_aware_links()
 
-    opts.root ||= '/'
-    if opts.root[0] != '/'
-      opts.root = '/' + opts.root
-    Earl.root = opts.root
+    Earl.root = '/'
+    if window.location.pathname.match('.html')
+      Earl.root += location.pathname.match(/\/(\w+\.html)/)[1] + '/'   
 
     # Earl, don't forget to update us if the browser back or forward button pressed
     window.addEventListener 'popstate', (ev) -> 
@@ -90,7 +89,7 @@ window.Earl =
       # after it is processed. 
       seek_to_hash = true
 
-    loc.url = url
+    loc.url = url or '/'
     loc.hash = hash
 
     save loc
@@ -189,7 +188,8 @@ react_to_location = ->
 
       # update browser history if it hasn't already been updated
       if url_from_browser_location() != new_location
-        history.pushState loc.query_params, title, (Earl.root + '/' + new_location).replace(/(\/)+/', '/')
+        h = (Earl.root + new_location)
+        history.pushState loc.query_params, title, h.replace(/(\/){2,}/, '/').replace(/(\/)$/, '')
 
       @last_location = new_location
 
@@ -214,15 +214,15 @@ url_from_browser_location = ->
   search = location.search?.replace(/\%2[fF]/g, '/')
   loc = location.pathname?.replace(/\%20/g, ' ')
 
-  if Earl.root && !!loc.match(Earl.root)
-    loc = loc.split(Earl.root)[1]
+  if Earl.root
+    loc = (loc + '/').split(Earl.root)[1]
 
   "#{loc}#{search}#{location.hash}"
 
 url_from_statebus = ->
   loc = fetch 'location'
 
-  relative_url = loc.url or '' 
+  relative_url = loc.url or '/'
 
   if loc.query_params && Object.keys(loc.query_params).length > 0
     query_params = ("#{k}=#{v}" for own k,v of loc.query_params)
