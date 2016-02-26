@@ -49,7 +49,7 @@ window.Earl =
 
     Earl.root = '/'
     if window.location.pathname.match('.html')
-      Earl.root += location.pathname.match(/\/(\w+\.html)/)[1] + '/'   
+      Earl.root += location.pathname.match(/\/([\w-_]+\.html)/)[1] + '/'
 
     # Earl, don't forget to update us if the browser back or forward button pressed
     window.addEventListener 'popstate', (ev) -> 
@@ -67,7 +67,7 @@ window.Earl =
     loc = fetch('location')
     loc.query_params = query_params or {}
 
-    # if the url has query pachrameters, parse and merge them into params
+    # if the url has query parameters, parse and merge them into params
     if url.indexOf('?') > -1
       [url, query_params] = url.split('?')
 
@@ -91,7 +91,6 @@ window.Earl =
 
     loc.url = url or '/'
     loc.hash = hash
-
     save loc
 
 
@@ -167,13 +166,13 @@ install_history_aware_links = ->
 
     dom.HISTORY_IGNORANT_LINK props, props.children
 
-
 # Earl's Reactive nerves keep him vigilant in making sure that changes in location
 # state are reflected in the browser history. Earl also updates the window title 
 # for you, free of charge, if you set fetch('document').title.
 
 react_to_location = -> 
   monitor = bus.reactive -> 
+
     loc = fetch 'location'
     doc = fetch 'document'
 
