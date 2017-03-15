@@ -14,7 +14,9 @@
 # offers. It is a drop in replacement for dom.A that will cause internal links
 # on your site to update state and browser location without loading a new page.
 # Make sure to tell him you want it by setting a history-aware-link attribute
-# on the script tag you use to request Earl to attend to your page. 
+# on the script tag you use to request Earl to attend to your page:
+#
+# <script src="/path/to/earl.js" history-aware-links></script>
 #
 # DISCLAIMER: Earl assumes his clients are html5 pushstate history compatible. 
 # If you want to serve older non-pushstate compatible browsers try installing the 
@@ -26,7 +28,6 @@
 #         url: the current browser location
 #         query_params: browser search values (e.g. blah?foo=fab&bar=nice)
 #         hash: the anchor tag (if any) in the link. e.g. blah.html#hash
-#    fetch('document')
 #         title: the window title
 
 
@@ -48,7 +49,7 @@ onload = ->
   window.addEventListener 'popstate', (ev) -> 
     Earl.load_page url_from_browser_location()
 
-  # By all means Earl, initialize location state
+  # By all means Earl, please do initialize location state
   Earl.load_page url_from_browser_location()
 
   # Earl, don't fall asleep on the job!
@@ -105,10 +106,10 @@ window.Earl =
 sc = document.querySelector('script[src*="earl"][src$=".coffee"], script[src*="earl"][src$=".js"]')
 hist_aware = sc.getAttribute('history-aware-links')?.toLowerCase() != 'false'
 
+
 if hist_aware
 
-  # if !window.A
-  #   throw "dom.A has not been defined yet!"
+  window.dom = window.dom || {}
 
   dom.A = ->
     props = @props
@@ -163,17 +164,16 @@ if hist_aware
 
 # Earl's Reactive nerves keep him vigilant in making sure that changes in location
 # state are reflected in the browser history. Earl also updates the window title 
-# for you, free of charge, if you set fetch('document').title.
+# for you, free of charge, if you set fetch('location').title.
 
 react_to_location = -> 
   monitor = bus.reactive -> 
 
     loc = fetch 'location'
-    doc = fetch 'document'
 
     # Update the window title if it has changed
-    title = doc.title or document.title
-    if title && title != doc.title
+    title = location.title or document.title
+    if title && title != location.title
       document.title = title
 
     # Respond to a location change

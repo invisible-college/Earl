@@ -55,6 +55,7 @@ sc = document.querySelector('script[src*="earl"][src$=".coffee"], script[src*="e
 hist_aware = ((ref = sc.getAttribute('history-aware-links')) != null ? ref.toLowerCase() : void 0) !== 'false';
 
 if (hist_aware) {
+  window.dom = window.dom || {};
   dom.A = function() {
     var handle_click, onClick, props;
     props = this.props;
@@ -106,11 +107,10 @@ if (hist_aware) {
 react_to_location = function() {
   var monitor;
   monitor = bus.reactive(function() {
-    var doc, el, h, loc, new_location, seek_to_hash, title;
+    var el, h, loc, new_location, seek_to_hash, title;
     loc = fetch('location');
-    doc = fetch('document');
-    title = doc.title || document.title;
-    if (title && title !== doc.title) {
+    title = location.title || document.title;
+    if (title && title !== location.title) {
       document.title = title;
     }
     new_location = url_from_statebus();
