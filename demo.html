@@ -1,6 +1,4 @@
-<script type="statebus">
-
-# Develop your application in this script block!    
+<script type="coffeedom">
 
 dom.BODY = ->  
 
@@ -52,7 +50,7 @@ dom.HOMEPAGE = ->
     A 
       href: '/what_i_do'
 
-      EARL()
+      EARL_HEADSHOT()
 
 
 
@@ -69,7 +67,7 @@ dom.RESUME = ->
     A 
       href: 'https://invisible.college'
       target: '_blank'
-      "...especially external links that open a new tab"
+      "...including external links that open a new tab"
   ]
 
   DIV null,
@@ -79,7 +77,7 @@ dom.RESUME = ->
         style: 
           padding: 50
 
-        EARL
+        EARL_HEADSHOT
           style: 
             width: 150
             display: 'inline-block'
@@ -99,23 +97,16 @@ dom.RESUME = ->
       ' and see that we return right back here'
 
 
-dom.EARL = -> 
+dom.EARL_HEADSHOT = -> 
 
   IMG 
     src: 'https://dl.dropboxusercontent.com/u/3403211/earl.jpg'
     style: @props.style or {}
 
 
-Earl.start_work
-  history_aware_links: true
-  root: '/demo.html'
+# Earl.start_work
+#   history_aware_links: true
+#   root: '/demo.html'
 
-#</script><script>
-  var statebus_client = "https://rawgit.com/invisible-college/statebus/master/client.js"   
-  document.write( '<script src="' + statebus_client + '" charset="utf-8"><\/script>')
-
-  var earldir = "https://rawgit.com/invisible-college/Earl/master/"
-  //var earldir = "../"
-  document.write( '<script src="' + earldir + 'earl.js' + '" charset="utf-8"><\/script>')
-
-</script>
+#</script><script src="https://stateb.us/client5.js"></script>
+<script src="https://rawgit.com/invisible-college/Earl/master/earl.js" history_aware_links></script>
