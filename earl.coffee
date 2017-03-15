@@ -13,7 +13,8 @@
 # Earl also likes to brag about the souped-up, history-aware dom.A link he 
 # offers. It is a drop in replacement for dom.A that will cause internal links
 # on your site to update state and browser location without loading a new page.
-# Make sure to tell him you want these. 
+# Make sure to tell him you want it by setting a history-aware-link attribute
+# on the script tag you use to request Earl to attend to your page. 
 #
 # DISCLAIMER: Earl assumes his clients are html5 pushstate history compatible. 
 # If you want to serve older non-pushstate compatible browsers try installing the 
@@ -31,40 +32,41 @@
 
 ###################################
 # Earl's API (Admissible Professional Inquiries): 
-
-#   Earl.start_work
-#     opts: 
-#        history_aware_links: Enables history aware link. Wraps basic dom.A. [false]
-
+# 
 #   Earl.load_page
 #     Convenience method for changing the page's url
 
-window.Earl =
 
-  start_work: (opts) -> 
-    opts ||= {}
 
-    if opts.history_aware_links
-      install_history_aware_links()
+onload = -> 
 
-    Earl.root = '/'
-    if window.location.pathname.match('.html')
-      Earl.root += location.pathname.match(/\/([\w-_]+\.html)/)[1] + '/'
+  Earl.root = '/'
+  if window.location.pathname.match('.html')
+    Earl.root += location.pathname.match(/\/([\w-_]+\.html)/)[1] + '/'
 
-    # Earl, don't forget to update us if the browser back or forward button pressed
-    window.addEventListener 'popstate', (ev) -> 
-      Earl.load_page url_from_browser_location()
-
-    # By all means Earl, initialize location state
+  # Earl, don't forget to update us if the browser back or forward button pressed
+  window.addEventListener 'popstate', (ev) -> 
     Earl.load_page url_from_browser_location()
 
-    # Earl, don't fall asleep on the job!
-    react_to_location()
+  # By all means Earl, initialize location state
+  Earl.load_page url_from_browser_location()
 
+  # Earl, don't fall asleep on the job!
+  react_to_location()
+
+if window.addEventListener
+  window.addEventListener 'load', onload, false 
+else if window.attachEvent
+  window.attachEvent 'onload', onload
+
+
+
+window.Earl =
 
   # Updating the browser window location. 
   load_page: (url, query_params) ->
     loc = fetch('location')
+    loc.host = window.location.host
     loc.query_params = query_params or {}
 
     # if the url has query parameters, parse and merge them into params
@@ -100,22 +102,14 @@ window.Earl =
 
 
 # Enables history aware link. Wraps basic dom.A.
-history_aware_links_installed = false 
-install_history_aware_links = -> 
-  return if history_aware_links_installed
+sc = document.querySelector('script[src*="earl"][src$=".coffee"], script[src*="earl"][src$=".js"]')
+hist_aware = sc.getAttribute('history-aware-links')?.toLowerCase() != 'false'
 
-  if !window.A
-    throw "dom.A has not been defined yet!"
+if hist_aware
 
-  dom.HISTORY_IGNORANT_LINK = window.A
-  history_aware_links_installed = true 
+  # if !window.A
+  #   throw "dom.A has not been defined yet!"
 
-  # This has to occur BEFORE statebus runs make_component on everything in window.dom. That happens
-  # after the initial compilation and evaluation of the coffeescript code. So you should call
-  # Earl.start_work should be called during the initial evaluation of the coffeescript if you want
-  # history aware links. 
-  # TODO: Either find a way around this requirement, or detect a bad sitution and provide a good
-  #       error message. 
   dom.A = ->
     props = @props
     if @props.href
@@ -123,7 +117,7 @@ install_history_aware_links = ->
       # Earl will call a click handler that the programmer passes in
       onClick = @props.onClick or (-> null)
 
-      handle_click = (event) => 
+      handle_click = (event) =>
         href = @props.href
 
         internal_link = !href.match('//') || !!href.match(location.origin)
@@ -164,7 +158,8 @@ install_history_aware_links = ->
       else
         @props.onClick = handle_click
 
-    dom.HISTORY_IGNORANT_LINK props, props.children
+    React.DOM.a props, props.children
+
 
 # Earl's Reactive nerves keep him vigilant in making sure that changes in location
 # state are reflected in the browser history. Earl also updates the window title 
@@ -230,8 +225,6 @@ url_from_statebus = ->
     relative_url += "##{loc.hash}"
 
   relative_url
-
-
 
 
 # For handling device-specific annoyances
