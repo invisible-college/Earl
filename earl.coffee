@@ -18,6 +18,11 @@
 #
 # <script src="/path/to/earl.js" history-aware-links></script>
 #
+# If the root of your app is served off of a directory, let Earl know by adding 
+# a script attribute, like: 
+#
+# <script src="/path/to/earl.js" root="path/served/at"></script>
+#
 # DISCLAIMER: Earl assumes his clients are html5 pushstate history compatible. 
 # If you want to serve older non-pushstate compatible browsers try installing the 
 # https://github.com/devote/HTML5-History-API polyfill first. 
@@ -38,10 +43,15 @@
 #     Convenience method for changing the page's url
 
 
+window.get_script_attr ||= (script, attr) ->
+  sc = document.querySelector("script[src*='#{script}'][src$='.coffee'], script[src*='#{script}'][src$='.js']")
+  sc.getAttribute(attr)
+
+hist_aware = !!get_script_attr('earl', 'history-aware-links')  
 
 onload = -> 
 
-  Earl.root = '/'
+  Earl.root = get_script_attr('earl', 'root') or '/'
   if window.location.pathname.match('.html')
     Earl.root += location.pathname.match(/\/([\w-_]+\.html)/)[1] + '/'
 
@@ -103,9 +113,6 @@ window.Earl =
 
 
 # Enables history aware link. Wraps basic dom.A.
-sc = document.querySelector('script[src*="earl"][src$=".coffee"], script[src*="earl"][src$=".js"]')
-hist_aware = sc.getAttribute('history-aware-links')?.toLowerCase() != 'false'
-
 
 if hist_aware
 

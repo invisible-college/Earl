@@ -1,5 +1,8 @@
 <script type="coffeedom">
 
+# Note: needs to be served by webserver, as most browsers prevent the use of 
+#       history.pushstate when using the file:// protocol
+
 dom.BODY = ->  
 
   loc = fetch 'location'
@@ -102,11 +105,6 @@ dom.EARL_HEADSHOT = ->
   IMG 
     src: 'https://dl.dropboxusercontent.com/u/3403211/earl.jpg'
     style: @props.style or {}
-
-
-# Earl.start_work
-#   history_aware_links: true
-#   root: '/demo.html'
 
 #</script><script src="https://stateb.us/client5.js"></script>
 <script src="https://rawgit.com/invisible-college/Earl/master/earl.js" history_aware_links></script>
