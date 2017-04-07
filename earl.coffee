@@ -45,7 +45,11 @@
 
 window.get_script_attr ||= (script, attr) ->
   sc = document.querySelector("script[src*='#{script}'][src$='.coffee'], script[src*='#{script}'][src$='.js']")
-  sc.getAttribute(attr)
+  val = sc.getAttribute(attr)
+  if val == ''
+    val = true 
+  val 
+
 
 hist_aware = !!get_script_attr('earl', 'history-aware-links')  
 
@@ -189,8 +193,7 @@ react_to_location = ->
 
       # update browser history if it hasn't already been updated
       if url_from_browser_location() != new_location
-        h = (Earl.root + new_location)
-        history.pushState loc.query_params, title, h.replace(/(\/){2,}/, '/').replace(/(\/)$/, '')
+        history.pushState loc.query_params, title, new_location.replace(/(\/){2,}/, '/').replace(/(\/)$/, '')
 
       @last_location = new_location
 
