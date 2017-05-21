@@ -58,6 +58,8 @@ onload = ->
   Earl.root = get_script_attr('earl', 'root') or '/'
   if window.location.pathname.match('.html')
     Earl.root += location.pathname.match(/\/([\w-_]+\.html)/)[1] + '/'
+  if Earl.root[0] != '/'
+    Earl.root = '/' + Earl.root
 
   # Earl, don't forget to update us if the browser back or forward button pressed
   window.addEventListener 'popstate', (ev) -> 
@@ -69,10 +71,7 @@ onload = ->
   # Earl, don't fall asleep on the job!
   react_to_location()
 
-if window.addEventListener
-  window.addEventListener 'load', onload, false 
-else if window.attachEvent
-  window.attachEvent 'onload', onload
+window.addEventListener?('load', onload, false) or window.attachEvent?('onload', onload)
 
 
 
@@ -106,7 +105,13 @@ window.Earl =
       # after it is processed. 
       seek_to_hash = true
 
-    loc.url = url or '/'
+    url ?= '/'
+    path = url 
+    if path.substring(0, Earl.root.length) != Earl.root
+      path = Earl.root + '/' + path 
+
+    loc.path = path.replace('//', '/')
+    loc.url = path.substring(Earl.root.length).replace('//', '/')
     loc.hash = hash
     save loc
 
@@ -125,29 +130,41 @@ if hist_aware
   dom.A = ->
     props = @props
     if @props.href
+      href = @props.href
 
       # Earl will call a click handler that the programmer passes in
-      onClick = @props.onClick or (-> null)
+      onClick = @props.onClick or (-> null)      
+
+      # Earl rewrites the address when necessary 
+      internal_link = !href.match('//') || !!href.match(location.origin)
+      is_mailto = !!href.toLowerCase().match('mailto')
+      if internal_link && !is_mailto
+        if href.substring(0, Earl.root.length) != Earl.root
+          rel = href[0] != '/'
+          if rel 
+            href = loc.path + '/' + href 
+          else  
+            href = Earl.root + href 
+          href = @props.href = href.replace('//', '/')
+
+
 
       handle_click = (event) =>
-        href = @props.href
-
-        internal_link = !href.match('//') || !!href.match(location.origin)
-        is_mailto = !!href.toLowerCase().match('mailto')
         opened_in_new_tab = event.altKey  || \
                             event.ctrlKey || \
                             event.metaKey || \
                             event.shiftKey
-        
+
+
         # In his wisdom, Earl sometimes just lets the default behavior occur
-        if !internal_link || opened_in_new_tab || is_mailto \
-           || @props.target == '_blank'
+        if !internal_link || opened_in_new_tab || is_mailto || @props.target == '_blank'
           onClick event
 
         # ... but other times Earl is history aware
         else 
           event.preventDefault()
           event.stopPropagation()
+
           Earl.load_page href
           onClick event
 
@@ -218,23 +235,20 @@ url_from_browser_location = ->
   search = location.search?.replace(/\%2[fF]/g, '/')
   loc = location.pathname?.replace(/\%20/g, ' ')
 
-  if Earl.root
-    loc = (loc + '/').split(Earl.root)[1]
-
   "#{loc}#{search}#{location.hash}"
 
 url_from_statebus = ->
   loc = fetch 'location'
 
-  relative_url = loc.url or '/'
+  url = loc.path or '/'
 
   if loc.query_params && Object.keys(loc.query_params).length > 0
     query_params = ("#{k}=#{v}" for own k,v of loc.query_params)
-    relative_url += "?#{query_params.join('&')}" 
+    url += "?#{query_params.join('&')}" 
   if loc.hash?.length > 0
-    relative_url += "##{loc.hash}"
+    url += "##{loc.hash}"
 
-  relative_url
+  url
 
 
 # For handling device-specific annoyances
