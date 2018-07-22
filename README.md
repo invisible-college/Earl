@@ -14,7 +14,7 @@ on your site to update state and browser location without loading a new page.
 Make sure to tell him you want it by setting a history-aware-link attribute
 on the script tag you use to request Earl to attend to your page:
 
-# <script src="/path/to/earl.js" history-aware-links></script> 
+`<script src="/path/to/earl.js" history-aware-links></script>`
 
 DISCLAIMER: Earl assumes his clients are html5 pushstate history compatible. 
 If you want to serve older non-pushstate compatible browsers try installing the 
